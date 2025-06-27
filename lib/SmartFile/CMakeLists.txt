@@ -1,0 +1,1 @@
+add_library(smart_file smart_file.cpp smart_file.h)
