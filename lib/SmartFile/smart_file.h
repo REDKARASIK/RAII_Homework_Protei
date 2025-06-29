@@ -125,5 +125,10 @@ SmartFile<Fstream, Deleter> make_smart_file(const std::string& filename, std::io
     if (!file.is_open()){ 
         throw std::runtime_error("Failed to open file: " + filename);
     }
-    return SmartFile(std::move(file));
+    return SmartFile<Fstream, Deleter>(std::move(file));
+}
+
+template<typename Fstream, typename Deleter = DefaultFileDeleter>
+SmartFile<Fstream, Deleter> make_smart_file(Fstream&& file) {
+    return SmartFile<Fstream, Deleter>(std::move(file));
 }
