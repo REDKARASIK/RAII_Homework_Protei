@@ -96,7 +96,7 @@ public:
         deleter_(file_);
     }
 
-    template<typename S = Fstream, typename = typename std::enable_if<is_readable<S>::value>::type>
+    template<typename S = Fstream, typename = typename std::enable_if<is_writable<S>::value>::type>
     void writeLine(const std::string& line) {
         file_ << line << '\n';
         if (!file_) {
@@ -104,7 +104,7 @@ public:
         }
     }
 
-    template<typename S = Fstream, typename = typename std::enable_if<is_writable<S>::value>::type>
+    template<typename S = Fstream, typename = typename std::enable_if<is_readable<S>::value>::type>
     std::string readLine() {
         std::string line;
         if (!std::getline(file_, line)) {
@@ -114,7 +114,9 @@ public:
     }
 
     void close() noexcept {
-        file_.close();
+        if (file_.is_open()) {
+            file_.close();
+        }
     }
 
     bool is_open() const noexcept {
@@ -124,3 +126,7 @@ private:
     Fstream file_;
     Deleter deleter_;
 };
+template<typename Fstream, typename Deleter = DefaultFileDeleter>
+SmartFile<Fstream, Deleter> make_smart_file(const std::string& name, std::ios::openmode mode = std::ios::in | std::ios::out | std::ios::app) {
+    return SmartFile<Fstream, DefaultFileDeleter>(name, mode);
+}
