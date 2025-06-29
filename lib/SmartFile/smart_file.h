@@ -65,14 +65,7 @@ struct is_file{
 template<typename Fstream, typename Deleter = DefaultFileDeleter>
 class SmartFile final {
     static_assert(is_file<Fstream>::value, "Fstream must be a valid file stream type");
-public:
-    explicit SmartFile(const std::string& filename, std::ios::openmode mode = std::ios::in | std::ios::out | std::ios::app) {
-        file_.open(filename.c_str(), mode);
-        if (!file_.is_open()) {
-            throw std::runtime_error("Failed to open file: " + filename);
-        }
-    }
-    
+public:    
     template<typename S = Fstream>
     explicit SmartFile(S&& file) noexcept: 
     file_(std::move(file))
@@ -127,6 +120,10 @@ private:
     Deleter deleter_;
 };
 template<typename Fstream, typename Deleter = DefaultFileDeleter>
-SmartFile<Fstream, Deleter> make_smart_file(const std::string& name, std::ios::openmode mode = std::ios::in | std::ios::out | std::ios::app) {
-    return SmartFile<Fstream, DefaultFileDeleter>(name, mode);
+SmartFile<Fstream, Deleter> make_smart_file(const std::string& filename, std::ios::openmode mode = std::ios::in | std::ios::out | std::ios::app) {
+    Fstream file(filename.c_str(), mode);
+    if (!file.is_open()){ 
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+    return SmartFile(std::move(file));
 }
